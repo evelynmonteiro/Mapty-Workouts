@@ -8,6 +8,10 @@ const inputDuration = document.querySelector(".form__input--duration");
 const inputCadence = document.querySelector(".form__input--cadence");
 const inputElevation = document.querySelector(".form__input--elevation");
 
+const openBtn = document.querySelector(".open__btn");
+const closeBtn = document.querySelector(".close__btn");
+const sidebar = document.querySelector(".sidebar");
+
 class Workout {
   date = new Date();
   id = (Date.now() + "").slice(-10);
@@ -73,6 +77,9 @@ class App {
     form.addEventListener("submit", this._newWorkout.bind(this));
     inputType.addEventListener("change", this._toggleElevationField);
     containerWorkouts.addEventListener("click", this._moveToPopup.bind(this));
+
+    openBtn.addEventListener("click", this._openSidebar);
+    closeBtn.addEventListener("click", this._closeSidebar);
   }
 
   _getPosition() {
@@ -109,6 +116,7 @@ class App {
     this._mapEvent = mapE;
     form.classList.remove("hidden");
     inputDistance.focus();
+    this._openSidebar();
   }
 
   _hideForm() {
@@ -255,6 +263,8 @@ class App {
     const workoutEl = e.target.closest(".workout");
     if (!workoutEl) return;
 
+    this._closeSidebar();
+
     const workout = this._workouts.find(
       (work) => work.id === workoutEl.dataset.id
     );
@@ -283,6 +293,24 @@ class App {
 
   reset() {
     localStorage.removeItem("workouts");
+  }
+
+  _openSidebar() {
+    sidebar.classList.add("open");
+    document
+      .querySelector(".leaflet-control-container")
+      .classList.add("hidden");
+    openBtn.classList.add("hidden");
+  }
+
+  _closeSidebar() {
+    sidebar.classList.remove("open");
+    setTimeout(() => {
+      document
+        .querySelector(".leaflet-control-container")
+        .classList.remove("hidden");
+      openBtn.classList.remove("hidden");
+    }, 500);
   }
 }
 
