@@ -8,15 +8,19 @@
 
 ## Table of Contents
 
-- [Overview](#overview)
-  - [About the project](#about-the-project)
+- [Mapty Workouts](#mapty-workouts)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+    - [About the project](#about-the-project)
   - [New features checklist](#new-features-checklist)
   - [Screenshots](#screenshots)
+    - [Desktop](#desktop)
+    - [Mobile](#mobile)
   - [Link](#link)
-- [My process](#my-process)
-  - [Built With](#built-with)
-  - [What I learned](#what-i-learned)
-- [Author](#author)
+  - [My Process](#my-process)
+    - [Built With](#built-with)
+    - [What I Learned](#what-i-learned)
+  - [Author](#author)
 
 ## Overview
 
@@ -27,10 +31,10 @@ This workout mapping project was developed during **Jonas Schdmedtmann's Javascr
 ## New features checklist
 
 - [x] Responsive
-- [ ] Cancel form
+- [x] Cancel form
+- [ ] Re-build objects prototype from Local Storage
 - [ ] Edit workout
 - [ ] Delete workout
-- [ ] Leaflet library with npm
 
 ## Screenshots
 
@@ -44,9 +48,9 @@ This workout mapping project was developed during **Jonas Schdmedtmann's Javascr
 
 ## Link
 
-- You can test the base version made by the teacher at this link: [Click here!](https://mapty.netlify.app/)
-- And you can also test my adapted version: [Click here!]()
-- Link to the course: [Click here!](https://www.udemy.com/course/the-complete-javascript-course/)
+- You can test the base version made by the teacher at this link: <a href="https://mapty.netlify.app/" target="_blank">Click here!</a>
+- And you can also test my adapted version: <a href="https://mapty-evemon.netlify.app/" target="_blank">Click here!</a>
+- Link to the course: <a href="https://www.udemy.com/course/the-complete-javascript-course/" target="_blank">Click here!</a>
 
 ## My Process
 

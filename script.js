@@ -1,6 +1,7 @@
 "use strict";
 
 const form = document.querySelector(".form");
+const formCloseBtn = document.querySelector(".form__button--close");
 const containerWorkouts = document.querySelector(".workouts");
 const inputType = document.querySelector(".form__input--type");
 const inputDistance = document.querySelector(".form__input--distance");
@@ -75,6 +76,7 @@ class App {
     this._getLocalStorage();
 
     form.addEventListener("submit", this._newWorkout.bind(this));
+    formCloseBtn.addEventListener("click", this._hideForm);
     inputType.addEventListener("change", this._toggleElevationField);
     containerWorkouts.addEventListener("click", this._moveToPopup.bind(this));
 
@@ -114,7 +116,7 @@ class App {
 
   _showForm(mapE) {
     this._mapEvent = mapE;
-    form.classList.remove("hidden");
+    form.classList.remove("form--hidden");
     inputDistance.focus();
     this._openSidebar();
   }
@@ -125,8 +127,8 @@ class App {
       inputCadence.value =
       inputElevation.value =
         "";
-    form.style.display = "none";
-    form.classList.add("hidden");
+    /* form.style.display = "none"; */
+    form.classList.add("form--hidden");
     setTimeout(() => (form.style.display = "grid"), 1000);
   }
 
