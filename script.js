@@ -14,10 +14,10 @@ const closeBtn = document.querySelector(".close__btn");
 const sidebar = document.querySelector(".sidebar");
 
 class Workout {
-  date = new Date();
-  id = (Date.now() + "").slice(-10);
 
-  constructor(coords, distance, duration) {
+  constructor(coords, distance, duration, id, date) {
+    this.id = id || (Date.now() + "").slice(-10);
+    this.date = date ? new Date(date) : new Date();
     this.coords = coords;
     this.distance = distance;
     this.duration = duration;
@@ -34,8 +34,8 @@ class Workout {
 
 class Running extends Workout {
   type = "running";
-  constructor(coords, distance, duration, cadence) {
-    super(coords, distance, duration);
+  constructor(coords, distance, duration, cadence, id, date) {
+    super(coords, distance, duration, id, date);
     this.cadence = cadence;
     this.calcPace();
     this._setDescription();
@@ -50,8 +50,8 @@ class Running extends Workout {
 
 class Cycling extends Workout {
   type = "cycling";
-  constructor(coords, distance, duration, elevationGain) {
-    super(coords, distance, duration);
+  constructor(coords, distance, duration, elevationGain, id, date) {
+    super(coords, distance, duration, id, date);
     this.elevationGain = elevationGain;
     this.calcSpeed();
     this._setDescription();
@@ -287,7 +287,15 @@ class App {
     const data = JSON.parse(localStorage.getItem("workouts"));
     if (!data) return;
 
-    this._workouts = data;
+    const dataObjects = data.map(workout => {
+      if(workout.type == "running"){
+        return new Running(workout.coords, workout.distance, workout.duration, workout.cadence, workout.id, workout.date)
+      } else {
+        return new Cycling(workout.coords, workout.distance, workout.duration, workout.elevation, workout.id, workout.date);
+      }
+    })
+
+    this._workouts = dataObjects;
     this._workouts.forEach((work) => {
       this._renderWorkout(work);
     });

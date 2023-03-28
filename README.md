@@ -32,7 +32,7 @@ This workout mapping project was developed during **Jonas Schdmedtmann's Javascr
 
 - [x] Responsive
 - [x] Cancel form
-- [ ] Re-build objects prototype from Local Storage
+- [x] Re-build objects prototype from Local Storage
 - [ ] Edit workout
 - [ ] Delete workout
 
