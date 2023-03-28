@@ -291,7 +291,7 @@ class App {
       if(workout.type == "running"){
         return new Running(workout.coords, workout.distance, workout.duration, workout.cadence, workout.id, workout.date)
       } else {
-        return new Cycling(workout.coords, workout.distance, workout.duration, workout.elevation, workout.id, workout.date);
+        return new Cycling(workout.coords, workout.distance, workout.duration, workout.elevationGain, workout.id, workout.date);
       }
     })
 
