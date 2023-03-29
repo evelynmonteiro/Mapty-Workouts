@@ -124,6 +124,10 @@ a:visited {
   cursor: pointer;
 }
 
+.workout__button--close:hover{
+  color: #961818;
+}
+
 .workout__title {
   font-size: 1.7rem;
   font-weight: 600;

@@ -34,7 +34,7 @@ This workout mapping project was developed during **Jonas Schdmedtmann's Javascr
 - [x] Cancel form
 - [x] Re-build objects prototype from Local Storage
 - [ ] Edit workout
-- [ ] Delete workout
+- [x] Delete workout
 
 ## Screenshots
 

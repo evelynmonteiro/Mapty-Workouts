@@ -78,7 +78,7 @@ class App {
     form.addEventListener("submit", this._newWorkout.bind(this));
     formCloseBtn.addEventListener("click", this._hideForm);
     inputType.addEventListener("change", this._toggleElevationField);
-    containerWorkouts.addEventListener("click", this._moveToPopup.bind(this));
+    containerWorkouts.addEventListener("click", this._handleContainerClick.bind(this));
 
     openBtn.addEventListener("click", this._openSidebar);
     closeBtn.addEventListener("click", this._closeSidebar);
@@ -184,8 +184,42 @@ class App {
     this._setLocalStorage();
   }
 
+  _deteleWorkout(e){
+    const del = confirm("Are you sure you want to delete this workout?")
+    
+    if(del){
+      const workoutEl = e.target.closest(".workout")
+      const workoutDelIndex = this._workouts.findIndex((work) => work.id === workoutEl.dataset.id)
+
+      this._workouts.splice(workoutDelIndex, 1)
+
+      this._setLocalStorage()
+
+      workoutEl.remove()
+
+      console.log(workoutEl.dataset.id)
+
+      this._map.eachLayer(function(layer){
+        if(layer instanceof L.Marker && layer.options.workoutID == workoutEl.dataset.id){
+          layer.remove()
+        }
+      })
+    }
+  }
+
+  _handleContainerClick(e){
+    const closeBtn = e.target.closest(".workout__button--close")
+    
+    if(closeBtn){
+      this._deteleWorkout(e)
+      return;
+    }
+
+    this._moveToPopup(e)
+  }
+
   _renderWorkoutMarker(workout) {
-    L.marker(workout.coords)
+    L.marker(workout.coords, {workoutID: workout.id})
       .addTo(this._map)
       .bindPopup(
         L.popup({
