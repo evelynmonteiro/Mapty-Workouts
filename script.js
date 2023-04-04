@@ -2,6 +2,7 @@
 
 const form = document.querySelector(".form");
 const formCloseBtn = document.querySelector(".form__button--close");
+const formTitle = document.querySelector(".form__title")
 const containerWorkouts = document.querySelector(".workouts");
 const inputType = document.querySelector(".form__input--type");
 const inputDistance = document.querySelector(".form__input--distance");
@@ -69,14 +70,17 @@ class App {
   _mapZoomLevel = 13;
   _mapEvent;
   _workouts = [];
+  _editMode = false;
+  _editWorkoutObj;
+  _editWorkoutEl;
 
   constructor() {
     this._getPosition();
 
     this._getLocalStorage();
 
-    form.addEventListener("submit", this._newWorkout.bind(this));
-    formCloseBtn.addEventListener("click", this._hideForm);
+    form.addEventListener("submit", this._handleFormSubmit.bind(this));
+    formCloseBtn.addEventListener("click", this._hideForm.bind(this));
     inputType.addEventListener("change", this._toggleElevationField);
     containerWorkouts.addEventListener("click", this._handleContainerClick.bind(this));
 
@@ -115,13 +119,16 @@ class App {
   }
 
   _showForm(mapE) {
-    this._mapEvent = mapE;
+    console.log(this._editMode)
+    if(mapE != null) this._mapEvent = mapE;
+    formTitle.innerText = 'Add your workout'
     form.classList.remove("form--hidden");
     inputDistance.focus();
     this._openSidebar();
   }
 
   _hideForm() {
+    this._editMode = false
     inputDistance.value =
       inputDuration.value =
       inputCadence.value =
@@ -197,8 +204,6 @@ class App {
 
       workoutEl.remove()
 
-      console.log(workoutEl.dataset.id)
-
       this._map.eachLayer(function(layer){
         if(layer instanceof L.Marker && layer.options.workoutID == workoutEl.dataset.id){
           layer.remove()
@@ -207,11 +212,107 @@ class App {
     }
   }
 
+  _editWorkout(e){
+    const validInputs = (...inputs) =>
+      inputs.every((inp) => Number.isFinite(inp));
+
+    const allPositive = (...inputs) => inputs.every((inp) => inp > 0);
+
+    e.preventDefault();
+
+    const type = inputType.value;
+    const distance = +inputDistance.value;
+    const duration = +inputDuration.value;
+    let workout;
+
+    if (type === "running") {
+      const cadence = +inputCadence.value;
+      if (
+        !validInputs(distance, duration, cadence) ||
+        !allPositive(distance, duration, cadence)
+      )
+        return alert("Input have to be positive number");
+
+      workout = new Running(this._editWorkoutObj.coords, distance, duration, cadence, this._editWorkoutObj.id, this._editWorkoutObj.date)
+    }
+
+    if (type === "cycling") {
+      const elevation = +inputElevation.value;
+      if (
+        !validInputs(distance, duration, elevation) ||
+        !allPositive(distance, duration, elevation)
+      )
+        return alert("Input have to be positive number");
+
+      workout = new Cycling(this._editWorkoutObj.coords, distance, duration, elevation, this._editWorkoutObj.id, this._editWorkoutObj.date);
+    }
+
+    const workoutEditIndex = this._workouts.findIndex((work) => work.id === this._editWorkoutObj.id)
+
+    this._workouts.splice(workoutEditIndex, 1, workout);
+
+    this._map.eachLayer(function(layer){
+      if(layer instanceof L.Marker && layer.options.workoutID == workout.id){
+        layer.remove()
+      }
+    })
+
+    this._renderWorkoutMarker(workout);
+
+    this._editWorkoutEl.remove();
+
+    this._renderWorkout(workout);
+
+    this._hideForm();
+
+    this._setLocalStorage();    
+    
+  }
+
+  _editWorkoutForm(e){
+    this._editMode = true;
+    this._showForm()
+    
+    // show worktout informations on form
+    formTitle.innerText = "Edit your workout"
+
+    this._editWorkoutEl = e.target.closest(".workout")
+    this._editWorkoutObj = this._workouts.find((work) => work.id === this._editWorkoutEl.dataset.id)
+    
+    inputType.value = this._editWorkoutObj.type
+    inputDuration.value = this._editWorkoutObj.duration
+    inputDistance.value = this._editWorkoutObj.distance
+    
+    if (this._editWorkoutObj.type == "cycling"){
+      inputElevation.closest(".form__row").classList.remove("form__row--hidden");
+      inputCadence.closest(".form__row").classList.add("form__row--hidden");
+      inputElevation.value = this._editWorkoutObj.elevationGain
+    } else {
+      inputCadence.closest(".form__row").classList.remove("form__row--hidden");
+      inputElevation.closest(".form__row").classList.add("form__row--hidden")
+      inputCadence.value = this._editWorkoutObj.cadence
+    }
+  }
+
+  _handleFormSubmit(e){
+    if(this._editMode == true){
+      this._editWorkout(e)
+    } else {
+      this._newWorkout(e)
+    }
+  }
+
   _handleContainerClick(e){
     const closeBtn = e.target.closest(".workout__button--close")
+    const editBtn = e.target.closest(".workout__button--edit")
     
     if(closeBtn){
       this._deteleWorkout(e)
+      return;
+    }
+
+    if(editBtn){
+      this._editWorkoutForm(e)
       return;
     }
 

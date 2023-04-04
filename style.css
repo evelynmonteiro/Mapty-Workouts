@@ -126,6 +126,12 @@ a:visited {
 
 .workout__button--close:hover{
   color: #961818;
+  transition: 0.3s;
+}
+
+.workout__button--edit:hover{
+  color: #0873a8;
+  transition: 0.3s;
 }
 
 .workout__title {
