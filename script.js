@@ -144,7 +144,7 @@ class App {
     inputCadence.closest(".form__row").classList.toggle("form__row--hidden");
   }
 
-  _newWorkout(e) {
+  _newWorkout(e, edit) {
     const validInputs = (...inputs) =>
       inputs.every((inp) => Number.isFinite(inp));
 
@@ -155,7 +155,8 @@ class App {
     const type = inputType.value;
     const distance = +inputDistance.value;
     const duration = +inputDuration.value;
-    const { lat, lng } = this._mapEvent.latlng;
+    const lat = edit ? undefined : this._mapEvent.latlng.lat;
+    const lng = edit ? undefined : this._mapEvent.latlng.lng;
     let workout;
 
     if (type === "running") {
@@ -166,7 +167,7 @@ class App {
       )
         return alert("Input have to be positive number");
 
-      workout = new Running([lat, lng], distance, duration, cadence);
+      workout = edit ? new Running(this._editWorkoutObj.coords, distance, duration, cadence, this._editWorkoutObj.id, this._editWorkoutObj.date) : new Running([lat, lng], distance, duration, cadence);
     }
 
     if (type === "cycling") {
@@ -177,18 +178,35 @@ class App {
       )
         return alert("Input have to be positive number");
 
-      workout = new Cycling([lat, lng], distance, duration, elevation);
+      workout = edit ? new Cycling(this._editWorkoutObj.coords, distance, duration, elevation, this._editWorkoutObj.id, this._editWorkoutObj.date) : new Cycling([lat, lng], distance, duration, elevation);
     }
 
-    this._workouts.push(workout);
+    if(edit){
+      const workoutEditIndex = this._workouts.findIndex((work) => work.id === this._editWorkoutObj.id)
 
-    this._renderWorkoutMarker(workout);
+      this._workouts.splice(workoutEditIndex, 1, workout);
+
+      this._map.eachLayer(function(layer){
+        if(layer instanceof L.Marker && layer.options.workoutID == workout.id){
+          layer.remove()
+        }
+      })
+      
+      this._editWorkoutEl.remove();
+
+    } else {
+
+      this._workouts.push(workout);
+
+    }
 
     this._renderWorkout(workout);
 
+    this._renderWorkoutMarker(workout);
+
     this._hideForm();
 
-    this._setLocalStorage();
+    this._setLocalStorage(); 
   }
 
   _deteleWorkout(e){
@@ -210,63 +228,6 @@ class App {
         }
       })
     }
-  }
-
-  _editWorkout(e){
-    const validInputs = (...inputs) =>
-      inputs.every((inp) => Number.isFinite(inp));
-
-    const allPositive = (...inputs) => inputs.every((inp) => inp > 0);
-
-    e.preventDefault();
-
-    const type = inputType.value;
-    const distance = +inputDistance.value;
-    const duration = +inputDuration.value;
-    let workout;
-
-    if (type === "running") {
-      const cadence = +inputCadence.value;
-      if (
-        !validInputs(distance, duration, cadence) ||
-        !allPositive(distance, duration, cadence)
-      )
-        return alert("Input have to be positive number");
-
-      workout = new Running(this._editWorkoutObj.coords, distance, duration, cadence, this._editWorkoutObj.id, this._editWorkoutObj.date)
-    }
-
-    if (type === "cycling") {
-      const elevation = +inputElevation.value;
-      if (
-        !validInputs(distance, duration, elevation) ||
-        !allPositive(distance, duration, elevation)
-      )
-        return alert("Input have to be positive number");
-
-      workout = new Cycling(this._editWorkoutObj.coords, distance, duration, elevation, this._editWorkoutObj.id, this._editWorkoutObj.date);
-    }
-
-    const workoutEditIndex = this._workouts.findIndex((work) => work.id === this._editWorkoutObj.id)
-
-    this._workouts.splice(workoutEditIndex, 1, workout);
-
-    this._map.eachLayer(function(layer){
-      if(layer instanceof L.Marker && layer.options.workoutID == workout.id){
-        layer.remove()
-      }
-    })
-
-    this._renderWorkoutMarker(workout);
-
-    this._editWorkoutEl.remove();
-
-    this._renderWorkout(workout);
-
-    this._hideForm();
-
-    this._setLocalStorage();    
-    
   }
 
   _editWorkoutForm(e){
@@ -296,7 +257,7 @@ class App {
 
   _handleFormSubmit(e){
     if(this._editMode == true){
-      this._editWorkout(e)
+      this._newWorkout(e, true)
     } else {
       this._newWorkout(e)
     }
